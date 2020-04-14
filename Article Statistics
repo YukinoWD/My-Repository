@@ -1,0 +1,304 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+typedef struct node
+{
+	char data[80];
+	struct node *next;
+}List,*LinkList;
+int Create(LinkList &head)		//文章输入并且存储进单链表
+{
+	int result=1,i,n=0,j;
+	head=(LinkList)malloc(sizeof(List));
+	printf("输入文章，以#结束:\n");
+	char a[1000];
+	LinkList p=head,p1;
+	while(!n)
+	{
+		gets(a);
+		if(strlen(a)>80)
+		{
+			printf("输入有误,每行不能超过80个字符，请重新输入！\n");
+			result=0;
+			break;
+		}
+		else
+		{
+			if(a[0]=='#') break;
+			for(i=1;i<strlen(a);i++)
+			{
+				if(a[i]=='#') 
+					{
+						n=1;break;
+				}
+			}
+			for(j=i;j<strlen(a);j++)
+			{
+				a[j]='\0';
+			}
+				p1=(LinkList)malloc(sizeof(List));
+				strcpy(p1->data,a);
+				p->next=p1;
+				p=p1;
+		}
+	}
+	p->next=NULL;
+	return result;
+}
+void Showessay(LinkList head)		//显示文章
+{
+	for(LinkList p=head->next;p!=NULL;p=p->next)
+	{
+		printf("%s\n",p->data);
+	}
+}
+int Numletter(LinkList head)		//统计文章中字母个数
+{
+	int result=0,i;
+	for(LinkList p=head->next;p!=NULL;p=p->next)
+	{
+		for(i=0;i<strlen(p->data);i++)
+		{
+			if((p->data[i]>='a'&&p->data[i]<='z')||(p->data[i]>='A'&&p->data[i]<='Z'))
+				result++;
+		}
+	}
+	return result;
+}
+int Numnumber(LinkList head)		//统计文章中数字个数
+{
+	int result=0,i;
+	for(LinkList p=head->next;p!=NULL;p=p->next)
+	{
+		for(i=0;i<strlen(p->data);i++)
+		{
+			if(p->data[i]>='0'&&p->data[i]<='9')
+				result++;
+		}
+	}
+	return result;
+}
+int Numspace(LinkList head)			//统计文章中空格个数
+{
+	int result=0,i;
+	for(LinkList p=head->next;p!=NULL;p=p->next)
+	{
+		for(i=0;i<strlen(p->data);i++)
+		{
+			if(p->data[i]==' ')
+				result++;
+		}
+	}
+	return result;
+}
+int Numessay(LinkList head)			//统计文章中的总字符数
+{
+	int result=0,i;
+	for(LinkList p=head->next;p!=NULL;p=p->next)
+	{
+		result=result+strlen(p->data);
+	}
+	return result;
+}
+void Numstring(LinkList head)		//统计文章中指定字符的个数
+{
+	char a[1000];
+	int result=0,i,j,k,na,np;
+	printf("输入需要统计次数的字符串:\n");
+	gets(a);
+	LinkList p;
+	na=strlen(a);
+	for(p=head->next;p!=NULL;p=p->next)
+	{
+		np=strlen(p->data);
+		for(i=0;i<np;i++)
+		{
+			if(p->data[i]==a[0])
+			{
+				char temp[1000];
+				int k=0;
+				for(j=i;j<i+na;j++)
+				{
+					temp[k]=p->data[j];			//提取等长度的字符串到temp中
+					k++;
+				}
+				temp[k]='\0';					//标记temp尾端
+				if(strcmp(temp,a)==0) result++;
+			}
+		}
+	}
+	printf("字符串%s在文中出现了%d次\n",a,result);
+}
+int Deletestring(LinkList &head)				//删除指定字符串
+{
+	char a[1000];
+	int result=0,i,j,k,na,np,m,x=0;
+	printf("输入文中需要删除的字符串:\n");
+	gets(a);
+	LinkList p;
+	na=strlen(a);
+	for(p=head->next;p!=NULL;p=p->next)
+	{
+		np=strlen(p->data);
+		for(i=0,x=0;x<np;x++,i++)
+		{
+			m=0;
+			if(p->data[i]==a[0])
+			{
+				char temp[1000];
+				int k=0;
+				for(j=i;j<i+na;j++)
+				{
+					temp[k]=p->data[j];
+					k++;
+				}
+				temp[k]='\0';
+				if(strcmp(temp,a)==0) 
+				{
+					result++;
+					m=1;
+					for(j=i;j<np-na;j++)
+					{
+						p->data[j]=p->data[j+na];
+					}
+					p->data[j]='\0';
+				}
+			}
+			if(m==1) i--;
+		}
+		
+	}
+	if(result==0) printf("文章中没有%s!",a);
+	return result;
+}
+void Copyessay(LinkList &copyhead,LinkList head)		//单链表复制函数
+{
+	copyhead=(LinkList)malloc(sizeof(List));
+	LinkList p=copyhead,p1,p2;
+	for(p2=head->next;p2!=NULL;p2=p2->next)
+	{
+		p1=(LinkList)malloc(sizeof(List));
+		strcpy(p1->data,p2->data);
+		p->next=p1;
+		p=p1;
+	}
+	p1->next=NULL;
+}
+LinkList Saveessay(LinkList head,LinkList copyhead)			//用户决定是否保存
+{
+	char b[100];
+	printf("是否用修改后的文章覆盖原文章？\n");
+	printf("输入Yes表示是，输入No表示否，请输入:\n");
+	gets(b);
+	if(strcmp(b,"Yes")==0) 
+		{free(head);return copyhead;}
+	else 
+		{
+			if(strcmp(b,"No")==0) {free(copyhead);return head;}
+			else {
+				printf("输入错误！\n");
+				return Saveessay(head,copyhead);
+			}
+	}
+}
+void Showmenu()						//显示目录
+{
+	printf("输入下列所需执行操作的序号\n");
+	printf("*********************文章的编辑指令*******************\n");
+	printf("1、输出文章内容\n");
+	printf("2、输出文章中的全部字母个数\n");
+	printf("3、输出文章中的全部数字个数\n");
+	printf("4、输出文章中的全部空格个数\n");
+	printf("5、输出文章的总字数\n");
+	printf("6、输入一串字符，输出文章中该字符串出现的次数\n");
+	printf("7、输入一串需要在文章中删除的字符,显示删除后的文章\n");
+	printf("******************************************************\n");
+}
+int main()
+{
+	LinkList head;
+	int a;
+	char b[1000],j[1000];
+	printf("********************************************************************************************************************\n");
+	printf("********************************************************************************************************************\n");
+	printf("**                                                                                                                **\n");
+	printf("**                                               文章的编辑与统计                                                 **\n");
+	printf("**                                                                                                                **\n");
+	printf("********************************************************************************************************************\n");
+	printf("********************************************************************************************************************\n");
+	a=Create(head);
+	if(a==1)
+	{
+		printf("输入成功！\n\n");
+		while(1)			//循环执行相应指令
+		{
+			while(1)
+			{
+				Showmenu();
+				gets(b);
+				if(strcmp(b,"1")==0||strcmp(b,"2")==0||strcmp(b,"3")==0||strcmp(b,"4")==0||strcmp(b,"5")==0||strcmp(b,"6")==0||strcmp(b,"7")==0)	//输出指令是否正确
+					break;
+				else printf("输入错误，请输入正确的序号!\n");
+			}
+			if(strcmp(b,"1")==0)  {Showessay(head);}
+			if(strcmp(b,"2")==0)  
+			{		printf("*****************************\n");
+					printf("文章中字母有%d个\n",Numletter(head));
+					printf("*****************************\n");
+			}
+			if(strcmp(b,"3")==0)  
+			{
+				printf("*****************************\n");
+				printf("文章中数字有%d个\n",Numnumber(head));
+				printf("*****************************\n");
+			}
+			if(strcmp(b,"4")==0) 
+			{
+				printf("*****************************\n");
+				printf("文章中有空格%d个\n",Numspace(head));
+				printf("*****************************\n");
+			}
+			if(strcmp(b,"5")==0)  
+			{
+				printf("*****************************\n");
+				printf("文章总字数为%d\n",Numessay(head));
+				printf("*****************************\n");
+			}
+			if(strcmp(b,"6")==0)  
+			{
+				printf("*****************************\n");
+				Numstring(head);
+				printf("*****************************\n");
+			}
+			if(strcmp(b,"7")==0)
+			{
+					LinkList copyhead=NULL;
+					char b[100];
+					Copyessay(copyhead,head);
+					int gg;
+					gg=Deletestring(copyhead);
+					if(gg!=0)				
+					{
+					printf("*****************************\n");
+					Showessay(copyhead);
+					printf("*****************************\n");
+					head=Saveessay(head,copyhead);		//保存文章
+					}
+			}
+			while(1)
+			{
+				printf("请回复下列序号:\n");
+				printf("1、返回目录。\n");
+				printf("2、结束程序。\n");
+				gets(j);
+				if(strcmp(j,"2")==0) {printf("程序结束，感谢使用！\n");return 0;}
+				else
+				{
+					if(strcmp(j,"1")==0) break;
+					else
+						printf("输入错误，请重新输入!\n");
+				}
+			}
+		}	
+	}
+}
