@@ -1,0 +1,140 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ElevatorManager
+{
+    public class Elevator
+    {
+        public int Num_elevator;
+        public int MaxNum_paseengers;
+        public int MaxLoad;
+        public int Servicefloor;
+        public int Currentfloor;
+        public int Direction;
+        public int Endfloor;
+        public int[] Targerfloor;
+        public int CountDown;
+        public int Opening;
+        public int Time_changefloor;
+
+        public Elevator()
+        {
+            Num_elevator = 0;
+            MaxNum_paseengers = 10;
+            MaxLoad=10;
+            Servicefloor = 0;
+            Currentfloor = 0;
+            Direction = 0;
+            Endfloor = 0;
+            Targerfloor = new int[21];
+            CountDown = 5;
+            Opening = 0;
+            Time_changefloor = 2;
+        }
+
+        public Elevator(int N_elevator,int MaxN_passenger,int MaxL,int Sfloor)
+        {
+            Num_elevator = N_elevator;
+            MaxNum_paseengers = MaxN_passenger;
+            MaxLoad = MaxL;
+            Servicefloor = Sfloor;
+            Currentfloor = 0;
+            Direction = 0;
+            Endfloor = 0;
+            Targerfloor = new int[21];
+            CountDown = 5;
+            Opening = 0;
+            Time_changefloor = 2;
+        }
+
+        public void SetTargerfloor(int Targer)
+        {
+            this.Targerfloor[Targer] = 1;
+            if(this.Direction==0)
+            {
+                Direction = Currentfloor <= Targer ? 1 : -1;
+                this.Endfloor = Targer;
+            }
+            else if(this.Direction==1)
+            {
+                Endfloor = Endfloor > Targer ? Endfloor : Targer;
+            }
+            else if(this.Direction==-1)
+            {
+                Endfloor = Endfloor < Targer ? Endfloor : Targer;
+            }
+        }
+
+        public void CancelTargerfloor(int Targer)
+        {
+            this.Targerfloor[Targer] = 0;
+        }
+
+        public void MoveElevator()
+        {
+            if(this.Opening==1)
+            {
+                if(CountDown!=0)
+                {
+                    CountDown--;
+                }
+                else
+                {
+                    this.Opening = 0;
+                    CountDown = Time_changefloor;
+                }
+            }
+            else if(this.Direction==1)
+            {
+                if(this.CountDown!=0)
+                {
+                    CountDown--;
+                }
+                else
+                {
+                    this.Currentfloor++;
+                    CountDown = Time_changefloor;
+                    
+                    if(this.Targerfloor[this.Currentfloor]==1)
+                    {
+                        this.Opening = 1;
+                        if (this.Currentfloor == this.Endfloor)
+                        {
+                            this.Direction = 0;
+                        }
+                        this.CancelTargerfloor(Currentfloor);
+                    }
+                }
+            }
+            else if (this.Direction == -1)
+            {
+                if (this.CountDown != 0)
+                {
+                    CountDown--;
+                }
+                else
+                {
+                    this.Currentfloor--;
+                    CountDown = Time_changefloor;
+
+                    if (this.Targerfloor[this.Currentfloor] == 1)
+                    {
+                        this.Opening = 1;
+                        if (this.Currentfloor == this.Endfloor)
+                        {
+                            this.Direction = 0;
+                            this.Endfloor = 0;
+                        }
+                        this.CancelTargerfloor(Currentfloor);
+                    }
+                }
+            }
+        }
+
+    }
+    
+    
+}
