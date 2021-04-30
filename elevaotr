@@ -138,3 +138,232 @@ namespace ElevatorManager
     
     
 }
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ElevatorManager
+{
+    public class Manager
+    {
+        public Elevator elevator1 ;
+        public Elevator elevator2 ;
+        public Elevator elevator3 ;
+        public Elevator elevator4 ;
+
+        public Floor Floors;
+
+        public int[] UpService;
+        public int[] DownService;
+
+
+        public Manager()
+        {
+            elevator1 = new Elevator(1, 10, 10, 1);
+            elevator2 = new Elevator(2, 10, 10, 1);
+            elevator3 = new Elevator(3, 10, 10, 1);
+            elevator4 = new Elevator(4, 10, 10, 1);
+            Floors = new Floor();
+            UpService = new int[21];
+            DownService= new int[21];
+            for(int i=0;i<21;i++)
+            {
+                UpService[i] = 0;
+                DownService[i] = 0;
+            }
+        }
+
+        public int ElevatorDistance(int floor, int direction,Elevator elevtaor)
+        {
+            if (elevtaor.Direction == 0)
+            {
+                return Math.Abs(elevtaor.Currentfloor - floor);
+
+            }
+            else if (elevtaor.Direction == direction)
+            {
+                if (elevtaor.Direction == 1)
+                {
+                    if (elevtaor.Currentfloor <= floor)
+                    {
+                        return Math.Abs(elevator1.Currentfloor - floor);
+
+                    }
+                }
+                if (elevtaor.Direction == -1)
+                {
+                    if (elevtaor.Currentfloor >= floor)
+                    {
+                        return Math.Abs(elevtaor.Currentfloor - floor);
+
+                    }
+                }
+            }
+            return 100;
+        }
+
+
+        public int ChoseElevator(int floor, int direction)
+        {
+            int MinDistance=100;
+            int tempelevator=0;
+            if(ElevatorDistance(floor, direction, elevator1)<MinDistance)
+            {
+                MinDistance = ElevatorDistance(floor, direction, elevator1);
+                tempelevator = 1;
+            }
+            if (ElevatorDistance(floor, direction, elevator2) < MinDistance)
+            {
+                MinDistance = ElevatorDistance(floor, direction, elevator1);
+                tempelevator = 2;
+            }
+            if (ElevatorDistance(floor, direction, elevator3) < MinDistance)
+            {
+                MinDistance = ElevatorDistance(floor, direction, elevator1);
+                tempelevator = 3;
+            }
+            if (ElevatorDistance(floor, direction, elevator4) < MinDistance)
+            {
+                MinDistance = ElevatorDistance(floor, direction, elevator1);
+                tempelevator = 4;
+            }
+     
+            return tempelevator;
+
+        }
+
+        public void Check()
+        {
+            for (int i = 0; i < 21; i++)
+            {
+                if (UpService[i] !=0)
+                {
+                    int x = ChoseElevator(i, 1);
+                    if(x==1)
+                    {
+                        elevator1.SetTargerfloor(i);
+                        UpService[i] = 0;
+                    }
+                    else if (x == 2)
+                    {
+                        elevator2.SetTargerfloor(i);
+                        UpService[i] = 0;
+                    }
+                    else if (x == 3)
+                    {
+                        elevator3.SetTargerfloor(i);
+                        UpService[i] = 0;
+                    }
+                    else if (x == 4)
+                    {
+                        elevator4.SetTargerfloor(i);
+                        UpService[i] = 0;
+                    }
+                }
+                if (DownService[i] != 0)
+                {
+                    int x = ChoseElevator(i, -1);
+                    if (x == 1)
+                    {
+                        elevator1.SetTargerfloor(i);
+                        DownService[i] = 0;
+                    }
+                    else if (x == 2)
+                    {
+                        elevator2.SetTargerfloor(i);
+                        DownService[i] = 0;
+                    }
+                    else if (x == 3)
+                    {
+                        elevator3.SetTargerfloor(i);
+                        DownService[i] = 0;
+                    }
+                    else if (x == 4)
+                    {
+                        elevator4.SetTargerfloor(i);
+                        DownService[i] = 0;
+                    }
+                }
+            }
+        }
+
+        public void CheckButton(int floor,int direction)
+        {
+            int x = ChoseElevator(floor, direction);
+            if(x==1)
+            {
+                elevator1.SetTargerfloor(floor);
+            }
+            else if (x == 2)
+            {
+                elevator2.SetTargerfloor(floor);
+            }
+            else if (x == 3)
+            {
+                elevator3.SetTargerfloor(floor);
+            }
+            else if (x == 4)
+            {
+                elevator4.SetTargerfloor(floor);
+            }
+            else
+            {
+                SetService(floor, direction);
+            }
+        }
+
+        public void SetService(int floor,int direction)
+        {
+            if (direction == 1)
+            {
+                UpService[floor] = 1;
+            }
+            else
+            {
+                DownService[floor] = 1;
+            }
+        }
+
+
+
+
+        /// <summary>
+        /// 楼层按钮触发
+        /// floor为楼层，direction为按下的方向，-1为下 ，0为没有按下，1为上
+        /// </summary>
+        public void FloorBuuton(int floor,int direction)
+        {
+            this.Floors.SetFloorDirection(floor,direction);
+            int x = ChoseElevator(floor, direction);
+            if (x!=0)
+            {
+                switch(x)
+                {
+                    case 1: elevator1.SetTargerfloor(floor);break;
+                    case 2: elevator2.SetTargerfloor(floor);break;
+                    case 3: elevator3.SetTargerfloor(floor);break;
+                    case 4: elevator4.SetTargerfloor(floor);break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                SetService(floor, direction);       
+            }
+        }
+
+
+        /// <summary>
+        /// 每隔一秒发生的动作
+        /// </summary>
+        public void MangerAction()
+        {
+            this.elevator1.MoveElevator();
+        }
+    }
+}
